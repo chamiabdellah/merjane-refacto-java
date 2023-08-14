@@ -15,4 +15,12 @@ public class MyControllerExceptionHandler {
         // TODO : for a more understandable code we can add an object to hold the response
         return ex.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(NoSuchProductType.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String NoSuchProductType(OrderNotFoundException ex){
+        // TODO : for a more understandable code we can add an object to hold the response
+        return ex.getMessage();
+    }
 }

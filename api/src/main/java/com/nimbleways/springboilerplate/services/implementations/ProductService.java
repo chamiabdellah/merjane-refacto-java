@@ -27,6 +27,9 @@ public class ProductService {
 
     // TODO : change the code structure to create reusable methods ('indisponible', 'normal vente') to increase
     //  code reusability and readability
+
+    // FIXME : When  we moved the business logic from the controller to the Service, the new methods are more visible,
+    //  FIXME : The code duplication is more clearer, but because of the time I can't do it right now
     public void handleSeasonalProduct(Product product) {
         if ((LocalDate.now().isAfter(product.getSeasonStartDate()) && LocalDate.now().isBefore(product.getSeasonEndDate())
                 && product.getAvailable() > 0)) {

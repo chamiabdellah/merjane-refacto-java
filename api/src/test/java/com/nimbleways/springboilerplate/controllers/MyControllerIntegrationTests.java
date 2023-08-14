@@ -59,6 +59,8 @@ public class MyControllerIntegrationTests {
                 assertEquals(resultOrder.getId(), order.getId());
         }
 
+        // TODO : add corner cases tests : to test the error handling of the controller
+
         private static Order createOrder(Set<Product> products) {
                 Order order = new Order();
                 order.setItems(products);
@@ -76,6 +78,9 @@ public class MyControllerIntegrationTests {
                                 LocalDate.now().plusDays(58)));
                 products.add(new Product(null, 15, 30, "SEASONAL", "Grapes", null, LocalDate.now().plusDays(180),
                                 LocalDate.now().plusDays(240)));
+                // add the case of FLASHSALE before the actual implementation (according to the TDD methodology)
+                products.add(new Product(null, 20, 150, "FALSHSALE", "Bread", null, LocalDate.now().plusDays(200),
+                        LocalDate.now().plusDays(250)));
                 return products;
         }
 }

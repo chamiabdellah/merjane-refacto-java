@@ -3,6 +3,7 @@ package com.nimbleways.springboilerplate.contollers;
 import com.nimbleways.springboilerplate.dto.product.ProcessOrderResponse;
 import com.nimbleways.springboilerplate.entities.Order;
 import com.nimbleways.springboilerplate.entities.Product;
+import com.nimbleways.springboilerplate.exceptions.NoSuchProductType;
 import com.nimbleways.springboilerplate.exceptions.OrderNotFoundException;
 import com.nimbleways.springboilerplate.repositories.OrderRepository;
 import com.nimbleways.springboilerplate.repositories.ProductRepository;
@@ -28,9 +29,7 @@ public class MyController {
     @Autowired
     private ProductService productService;
 
-    // TODO : move the DAO layer to the Service
-    @Autowired
-    private ProductRepository productRepository;
+    // DONE : move the DAO layer to the Service
 
     // TODO : the OrderRepository should be called from the Service layer
     @Autowired
@@ -69,9 +68,10 @@ public class MyController {
                     break;
                 default:
                     // throw : BAD_REQUEST exception with a comment
+                    throw new NoSuchProductType(product.getType());
             }
-            // TODO : add the 'FLASHSALE' products in a new switch (use the existing methods from old products)
-            // TODO : add a 'default' case if none types match
+            // DONE : add the 'FLASHSALE' products in a new switch (use the existing methods from old products)
+            // DONE : add a 'default' case if none types match
         }
 
         return ResponseEntity.ok(new ProcessOrderResponse(order.getId()));
