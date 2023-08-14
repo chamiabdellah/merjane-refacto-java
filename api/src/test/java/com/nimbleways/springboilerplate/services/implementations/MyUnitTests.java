@@ -24,6 +24,7 @@ public class MyUnitTests {
     @InjectMocks 
     private ProductService productService;
 
+    // TODO : change the name of the test method to clarify what it tests
     @Test
     public void test() {
         // GIVEN

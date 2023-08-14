@@ -11,39 +11,79 @@ import com.nimbleways.springboilerplate.repositories.ProductRepository;
 @Service
 public class ProductService {
 
-    @Autowired
-    ProductRepository pr;
+    // TODO : create reusable methods to avoid code duplication
 
     @Autowired
-    NotificationService ns;
+    ProductRepository productRepository;
+
+    @Autowired
+    NotificationService notificationService;
 
     public void notifyDelay(int leadTime, Product p) {
         p.setLeadTime(leadTime);
-        pr.save(p);
-        ns.sendDelayNotification(leadTime, p.getName());
+        productRepository.save(p);
+        notificationService.sendDelayNotification(leadTime, p.getName());
     }
 
-    public void handleSeasonalProduct(Product p) {
-        if (LocalDate.now().plusDays(p.getLeadTime()).isAfter(p.getSeasonEndDate())) {
-            ns.sendOutOfStockNotification(p.getName());
-            p.setAvailable(0);
-            pr.save(p);
-        } else if (p.getSeasonStartDate().isAfter(LocalDate.now())) {
-            ns.sendOutOfStockNotification(p.getName());
-            pr.save(p);
+    // TODO : change the code structure to create reusable methods ('indisponible', 'normal vente') to increase
+    //  code reusability and readability
+    public void handleSeasonalProduct(Product product) {
+        if ((LocalDate.now().isAfter(product.getSeasonStartDate()) && LocalDate.now().isBefore(product.getSeasonEndDate())
+                && product.getAvailable() > 0)) {
+            product.setAvailable(product.getAvailable() - 1);
+            productRepository.save(product);
         } else {
-            notifyDelay(p.getLeadTime(), p);
+            //productService.handleSeasonalProduct(product);
+
+            if (LocalDate.now().plusDays(product.getLeadTime()).isAfter(product.getSeasonEndDate())) {
+                notificationService.sendOutOfStockNotification(product.getName());
+                product.setAvailable(0);
+                productRepository.save(product);
+            } else if (product.getSeasonStartDate().isAfter(LocalDate.now())) {
+                notificationService.sendOutOfStockNotification(product.getName());
+                productRepository.save(product);
+            } else {
+                notifyDelay(product.getLeadTime(), product);
+            }
         }
     }
 
-    public void handleExpiredProduct(Product p) {
-        if (p.getAvailable() > 0 && p.getExpiryDate().isAfter(LocalDate.now())) {
-            p.setAvailable(p.getAvailable() - 1);
-            pr.save(p);
+    public void handleExpiredProduct(Product product) {
+        if (product.getAvailable() > 0 && product.getExpiryDate().isAfter(LocalDate.now())) {
+            product.setAvailable(product.getAvailable() - 1);
+            productRepository.save(product);
         } else {
-            ns.sendExpirationNotification(p.getName(), p.getExpiryDate());
-            p.setAvailable(0);
-            pr.save(p);
+            //productService.handleExpiredProduct(product);
+
+            if (product.getAvailable() > 0 && product.getExpiryDate().isAfter(LocalDate.now())) {
+                product.setAvailable(product.getAvailable() - 1);
+                productRepository.save(product);
+            } else {
+                notificationService.sendExpirationNotification(product.getName(), product.getExpiryDate());
+                product.setAvailable(0);
+                productRepository.save(product);
+            }
         }
     }
+
+    public void handleNormalProduct(Product product) {
+        if (product.getAvailable() > 0) {
+            product.setAvailable(product.getAvailable() - 1);
+            productRepository.save(product);
+        } else {
+            int leadTime = product.getLeadTime();
+            if (leadTime > 0) {
+                notifyDelay(leadTime, product);
+            }
+        }
+    }
+
+    public void handleFlashsaleProduct(Product product) {
+
+    }
+
+    // Create internal methods to manage the requests : Goal move operations to those methods and keep the conditions
+    // on the service handlers
+
+
 }
